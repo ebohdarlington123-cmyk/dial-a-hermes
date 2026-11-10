@@ -9,8 +9,12 @@ PHONE="${DEMO_PHONE:-+2348031234567}"
 TOKEN="$(python3 -c 'import secrets;print(secrets.token_urlsafe(24))')"
 mkdir -p "$HERMES_HOME/plugins"
 cp -r "$ROOT/plugins/dial-a-hermes" "$ROOT/plugins/hermes-lang-pcm" "$HERMES_HOME/plugins/"
-hermes plugins enable dial-a-hermes </dev/null
-hermes plugins enable hermes-lang-pcm </dev/null
+enable() {  # plugin installs download a runtime; retry through flaky networks
+  for i in 1 2 3; do hermes plugins enable "$1" </dev/null && return 0; hermes pm doctor >/dev/null 2>&1 || true; done
+  return 1
+}
+enable dial-a-hermes
+enable hermes-lang-pcm
 if [[ -n "${MODEL_PROVIDER:-}" ]]; then
   hermes config set model.provider "$MODEL_PROVIDER"
   hermes config set model.default "${MODEL_NAME:?set MODEL_NAME too}"

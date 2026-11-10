@@ -100,6 +100,7 @@
     }
     history.push(typed); post();
   }
+  document.addEventListener("click", (e) => { if (e.target.closest("button")) e.target.closest("button").blur(); });
   $("send").onclick = send;
   $("del").onclick = () => { typed = typed.slice(0, -1); render(); };
   $("end").onclick = () => { session = null; history = []; typed = ""; out.textContent = "Session ended."; render(); };
@@ -108,7 +109,7 @@
     if (e.key === "Enter") { e.preventDefault(); send(); }
     else if (e.key === "Backspace") { e.preventDefault(); typed = typed.slice(0, -1); render(); }
     else if (e.key === "Escape") { $("end").click(); }
-    else if (e.key.length === 1 && session && !busy) { typed += e.key; render(); }
+    else if (e.key.length === 1 && session && !busy) { e.preventDefault(); typed += e.key; render(); }
     else if (/^[0-9*#]$/.test(e.key)) { press(e.key); }
   });
   async function poll() {
