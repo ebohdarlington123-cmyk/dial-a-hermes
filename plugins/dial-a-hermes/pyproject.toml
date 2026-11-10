@@ -1,0 +1,9 @@
+[project]
+name = "dial-a-hermes"
+version = "0.1.0"
+description = "Hermes Agent platform plugin: USSD + SMS for basic feature phones"
+requires-python = ">=3.11"
+license = "MIT"
+dependencies = [
+  "aiohttp>=3.9,<4",
+]

@@ -1,0 +1,12 @@
+name: hermes-lang-pcm
+version: "0.1.0"
+description: "Nigerian Pidgin (Naijá) language pack for Hermes Agent: approval prompts, approve/deny/stop replies, clarify prompts and common gateway notices. Partial pack (falls back to English). Manifest-only, no code, no network."
+author: Ebube Eboh
+license: MIT
+homepage: https://github.com/ebohdarlington123-cmyk/dial-a-hermes
+tags: [language-pack, pidgin, naija, nigeria, africa]
+requires_hermes: ">=0.23.1"
+provides_locales:
+  - id: pcm
+    endonym: "Naijá (Pidgin)"
+    rtl: false

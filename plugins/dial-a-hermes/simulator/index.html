@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dial-a-Hermes · feature-phone simulator</title>
+<style>
+  :root { --body:#2b2f36; --edge:#14171c; --screen:#b7c9a2; --ink:#1d2a14; --key:#3a3f47; --keytxt:#e9ecef; }
+  * { box-sizing: border-box; }
+  body { margin:0; min-height:100vh; display:flex; gap:48px; align-items:center; justify-content:center;
+         background:radial-gradient(circle at 30% 20%, #3b4252, #11141a 70%); font-family: system-ui, sans-serif; color:#e5e7eb; }
+  .phone { width:300px; padding:26px 22px 30px; border-radius:46px 46px 60px 60px; background:linear-gradient(160deg,#3a3f47,#1f2329);
+           box-shadow: 0 30px 60px rgba(0,0,0,.55), inset 0 2px 0 rgba(255,255,255,.08); border:2px solid var(--edge); }
+  .brand { text-align:center; font-weight:700; letter-spacing:.3em; font-size:12px; color:#9aa3ad; margin-bottom:10px; }
+  .screen { background:var(--screen); color:var(--ink); border-radius:10px; height:250px; padding:10px 12px; overflow:hidden;
+            box-shadow: inset 0 0 18px rgba(0,0,0,.35); border:6px solid #0e1013; font-family: "Courier New", monospace; font-size:14px; line-height:1.25;
+            display:flex; flex-direction:column; }
+  .status { display:flex; justify-content:space-between; font-size:11px; opacity:.75; margin-bottom:4px; }
+  #out { white-space:pre-wrap; flex:1; overflow:hidden; word-break:break-word; }
+  #entry { border-top:1px dashed rgba(29,42,20,.45); margin-top:4px; padding-top:4px; min-height:20px; font-weight:700; }
+  .softkeys { display:flex; justify-content:space-between; margin:14px 4px 8px; }
+  .soft { background:#20242a; color:var(--keytxt); border:none; border-radius:16px; padding:8px 16px; font-size:13px; cursor:pointer; }
+  .soft.call { background:#1f7a3a; } .soft.end { background:#a12a2a; }
+  .pad { display:grid; grid-template-columns:repeat(3,1fr); gap:9px; margin-top:8px; }
+  .key { background:var(--key); color:var(--keytxt); border:none; border-radius:14px; padding:9px 0 7px; font-size:20px; cursor:pointer;
+         box-shadow:0 3px 0 #15181c; }
+  .key small { display:block; font-size:9px; letter-spacing:.15em; opacity:.6; }
+  .key:active, .soft:active { transform: translateY(2px); box-shadow:none; }
+  .panel { width:340px; }
+  .panel h1 { font-size:22px; margin:0 0 6px; } .panel p { color:#9aa3ad; font-size:14px; line-height:1.45; }
+  .panel label { display:block; font-size:12px; color:#9aa3ad; margin-top:12px; }
+  .panel input { width:100%; padding:8px 10px; border-radius:8px; border:1px solid #444b55; background:#171a20; color:#e5e7eb; font-size:14px; }
+  .sms { margin-top:18px; background:#171a20; border:1px solid #2f3540; border-radius:12px; padding:12px; max-height:260px; overflow:auto; }
+  .sms h2 { font-size:13px; margin:0 0 8px; color:#9aa3ad; text-transform:uppercase; letter-spacing:.12em; }
+  .msg { background:#24303f; border-radius:10px; padding:8px 10px; margin-bottom:8px; font-size:13px; white-space:pre-wrap; }
+  .toast { position:fixed; top:20px; right:20px; background:#1f7a3a; color:#fff; padding:10px 14px; border-radius:10px; display:none; }
+</style>
+</head>
+<body>
+<div class="phone" aria-label="feature phone">
+  <div class="brand">HERMES 3310</div>
+  <div class="screen">
+    <div class="status"><span id="net">USSD</span><span id="clock"></span></div>
+    <div id="out">Dial the short code and press the green key.</div>
+    <div id="entry"></div>
+  </div>
+  <div class="softkeys">
+    <button class="soft call" id="send" title="Dial / Send (Enter)">Send</button>
+    <button class="soft" id="del" title="Delete (Backspace)">Clear</button>
+    <button class="soft end" id="end" title="End session (Esc)">End</button>
+  </div>
+  <div class="pad" id="pad"></div>
+</div>
+<div class="panel">
+  <h1>Dial-a-Hermes</h1>
+  <p>A local feature-phone simulator. It posts to the plugin's real Africa's Talking-style callback
+     (<code>sessionId</code>, <code>phoneNumber</code>, <code>serviceCode</code>, <code>text</code>), so what you see here is exactly what a caller sees.
+     Click the keys or type on your keyboard (letters work too).</p>
+  <label>Phone number<input id="phone"></label>
+  <label>Short code<input id="code"></label>
+  <div class="sms"><h2>SMS inbox</h2><div id="inbox"><div class="msg" style="opacity:.6">No messages yet.</div></div></div>
+</div>
+<div class="toast" id="toast">New SMS</div>
+<script>
+/*__DAH_CONFIG__*/
+(function () {
+  const cfg = window.DAH_CONFIG || {};
+  const $ = (id) => document.getElementById(id);
+  const out = $("out"), entry = $("entry");
+  $("phone").value = cfg.phone || "+2348000000000";
+  $("code").value = cfg.serviceCode || "*384*4242#";
+  let session = null, history = [], typed = "", busy = false, seen = new Set();
+  const keys = [["1",""],["2","abc"],["3","def"],["4","ghi"],["5","jkl"],["6","mno"],["7","pqrs"],["8","tuv"],["9","wxyz"],["*",""],["0","+"],["#",""]];
+  for (const [k, sub] of keys) {
+    const b = document.createElement("button"); b.className = "key"; b.innerHTML = k + "<small>" + (sub || "&nbsp;") + "</small>";
+    b.onclick = () => press(k); $("pad").appendChild(b);
+  }
+  function render() { entry.textContent = session ? typed + "_" : (typed || $("code").value); }
+  function press(k) { if (busy) return; typed += k; render(); }
+  function clock() { const d = new Date(); $("clock").textContent = d.toTimeString().slice(0, 5); }
+  setInterval(clock, 10000); clock();
+  async function post() {
+    busy = true; out.textContent = "Please wait..."; entry.textContent = "";
+    const body = new URLSearchParams({ sessionId: session, phoneNumber: $("phone").value.trim(),
+      serviceCode: $("code").value.trim(), networkCode: "62130", text: history.join("*") });
+    try {
+      const r = await fetch(cfg.callback, { method: "POST", body, headers: { "Content-Type": "application/x-www-form-urlencoded" } });
+      const t = (await r.text()).replace(/\r/g, "");
+      if (t.startsWith("END ")) { out.textContent = t.slice(4); session = null; history = []; $("net").textContent = "USSD ended"; }
+      else if (t.startsWith("CON ")) { out.textContent = t.slice(4); $("net").textContent = "USSD"; }
+      else { out.textContent = "Network error (" + r.status + ")"; session = null; history = []; }
+    } catch (e) { out.textContent = "Connection problem."; session = null; history = []; }
+    busy = false; typed = ""; render();
+  }
+  function send() {
+    if (busy) return;
+    if (!session) {
+      session = "SIM" + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+      history = []; typed = ""; post(); return;
+    }
+    history.push(typed); post();
+  }
+  $("send").onclick = send;
+  $("del").onclick = () => { typed = typed.slice(0, -1); render(); };
+  $("end").onclick = () => { session = null; history = []; typed = ""; out.textContent = "Session ended."; render(); };
+  document.addEventListener("keydown", (e) => {
+    if (e.target.tagName === "INPUT") return;
+    if (e.key === "Enter") { e.preventDefault(); send(); }
+    else if (e.key === "Backspace") { e.preventDefault(); typed = typed.slice(0, -1); render(); }
+    else if (e.key === "Escape") { $("end").click(); }
+    else if (e.key.length === 1 && session && !busy) { typed += e.key; render(); }
+    else if (/^[0-9*#]$/.test(e.key)) { press(e.key); }
+  });
+  async function poll() {
+    try {
+      const r = await fetch(cfg.sms + "?phone=" + encodeURIComponent($("phone").value.trim()));
+      const data = await r.json();
+      const box = $("inbox"); let fresh = false;
+      for (const m of data.messages || []) {
+        if (seen.has(m.id)) continue; seen.add(m.id); fresh = true;
+        if (seen.size === 1) box.innerHTML = "";
+        const div = document.createElement("div"); div.className = "msg"; div.textContent = m.text; box.prepend(div);
+      }
+      if (fresh) { const t = $("toast"); t.style.display = "block"; setTimeout(() => t.style.display = "none", 2500); }
+    } catch (e) {}
+    setTimeout(poll, 2000);
+  }
+  render(); poll();
+})();
+</script>
+</body>
+</html>

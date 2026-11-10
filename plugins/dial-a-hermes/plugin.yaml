@@ -1,0 +1,62 @@
+name: dial-a-hermes
+label: USSD (Dial-a-Hermes)
+kind: platform
+version: "0.1.0"
+manifest_version: 2
+description: >
+  Use Hermes from any basic feature phone over USSD: dial a short code, type a question on the
+  keypad, read the answer page by page, and approve or deny risky commands with 1 or 2. Long
+  answers can also arrive by SMS. Works with the Africa's Talking USSD API (free sandbox) and
+  ships a local feature-phone simulator. Menus in English or Nigerian Pidgin.
+author: Ebube Eboh
+license: MIT
+homepage: https://github.com/ebohdarlington123-cmyk/dial-a-hermes
+tags: [platform, ussd, sms, feature-phone, africa, africastalking, pidgin]
+requires_hermes: ">=0.23.1"
+requires_env:
+  - name: USSD_ALLOWED_USERS
+    description: "Comma-separated phone numbers allowed to control this Hermes (E.164, e.g. +2348031234567). Empty = nobody."
+    prompt: "Allowed phone numbers"
+    password: false
+  - name: USSD_CALLBACK_TOKEN
+    description: "Random secret (16+ chars). Africa's Talking posts to https://<your-tunnel>/ussd/<token>."
+    prompt: "Callback token"
+    password: true
+    secret: true
+optional_env:
+  - name: USSD_HOST
+    description: "Listener host (default 127.0.0.1)"
+    password: false
+  - name: USSD_PORT
+    description: "Listener port (default 8095)"
+    password: false
+  - name: USSD_LANGUAGE
+    description: "Default menu language: en or pcm (Nigerian Pidgin)"
+    password: false
+  - name: USSD_REPLY_WAIT_SECONDS
+    description: "How long one USSD step waits for Hermes before showing 'Thinking... press 1' (0-9, default 6)"
+    password: false
+  - name: USSD_SIMULATOR
+    description: "true serves the local feature-phone simulator at /simulator/<token> (loopback host only)"
+    password: false
+  - name: USSD_SMS_MODE
+    description: "off (default), africastalking, or simulator"
+    password: false
+  - name: USSD_SMS_REPLIES
+    description: "When to SMS the full reply: long (default, replies longer than one screen), always, or off"
+    password: false
+  - name: AT_USERNAME
+    description: "Africa's Talking username ('sandbox' for the sandbox)"
+    password: false
+  - name: AT_API_KEY
+    description: "Africa's Talking API key (only for USSD_SMS_MODE=africastalking)"
+    password: true
+  - name: AT_SENDER_ID
+    description: "Optional Africa's Talking sender ID / short code for SMS"
+    password: false
+  - name: USSD_DEFAULT_COUNTRY_CODE
+    description: "Country code for local numbers like 0803... in the allowlist (default 234)"
+    password: false
+  - name: USSD_HOME_CHANNEL
+    description: "Phone number that receives cron / notification messages (default: first allowed number)"
+    password: false
