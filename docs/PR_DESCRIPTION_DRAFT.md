@@ -1,7 +1,7 @@
 <!-- DRAFT: do not open until the repo is public and the sha is filled in. One PR per entry file. -->
 ## Add dial-a-hermes to the plugin catalog
 
-Adds `plugin-catalog/dial-a-hermes.yaml`, pinned to `<sha>` of
+Adds `plugin-catalog/dial-a-hermes.yaml`, pinned to `ee1117f21afd63e473d9605e4a26a435ffb7a628` of
 https://github.com/ebohdarlington123-cmyk/dial-a-hermes (subdir `plugins/dial-a-hermes`). I own and maintain the repo.
 
 **What it does:** lets you talk to your Hermes from any phone over USSD, with no data, app or smartphone.

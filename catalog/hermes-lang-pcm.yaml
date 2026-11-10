@@ -1,6 +1,6 @@
 name: hermes-lang-pcm
 repo: https://github.com/ebohdarlington123-cmyk/dial-a-hermes
-sha: __REPLACE_WITH_40_CHAR_COMMIT_SHA__
+sha: ee1117f21afd63e473d9605e4a26a435ffb7a628
 subdir: plugins/hermes-lang-pcm
 title: Nigerian Pidgin (Naijá)
 description: "Nigerian Pidgin (Naijá, pcm) language pack for Hermes Agent: approval prompts, approve/deny/stop replies, exec-approval cards, clarify prompts and common gateway notices, plus Pidgin approval inputs (gree, i gree, oya, no gree). Partial pack, falls back to English; preserves placeholders and command syntax. Manifest-only plugin, no code execution, no network. Disclosure — text-only catalog; registering the pack never changes display.language, the user opts in via config."
