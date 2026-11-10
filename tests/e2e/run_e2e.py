@@ -97,7 +97,7 @@ def run(cmd, env, **kw):
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--provider", choices=["stub", "gemini"], default="stub")
-    ap.add_argument("--model", default="gemini-2.5-flash")
+    ap.add_argument("--model", default="gemini-3.6-flash")
     ap.add_argument("--keep", action="store_true", help="keep the temp HERMES_HOME")
     args = ap.parse_args()
     if args.provider == "gemini" and not os.environ.get("GEMINI_API_KEY"):

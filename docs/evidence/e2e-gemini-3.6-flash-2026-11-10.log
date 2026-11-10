@@ -1,0 +1,126 @@
+HERMES_HOME=/tmp/dah-e2e-aigbutxr
+hermes: Hermes Agent v0.23.1 (2026.9.24) · stable · local 3b4215785882
+  PASS plugin enabled in a fresh HERMES_HOME
+  PASS gateway started the USSD listener
+
+[1] ask a question, read the paged answer, SMS copy
+    > text='' (0.0s)
+      CON Dial-a-Hermes
+      1 Ask Hermes
+      2 Last reply
+      3 Approvals (0)
+      4 Language
+      0 Exit
+  PASS responded inside the 10s USSD window (0.0s)
+  PASS dial shows the main menu
+    > text='1' (0.0s)
+      CON Type your question:
+  PASS responded inside the 10s USSD window (0.0s)
+  PASS ask screen
+    > text='1*In two short sentences: what is Jos in Nigeria known for?' (6.0s)
+      CON Hermes is thinking...
+      1 Check again 9 Menu
+  PASS responded inside the 10s USSD window (6.0s)
+  PASS slow reply shows 'Thinking... press 1'
+    > text='1*In two short sentences: what is Jos in Nigeria known for?*1' (2.8s)
+      CON (1/3) Jos, the capital of Plateau State, is famous for its cool temperate climate and scenic rock formations. It is also historically renowned as a major
+      1 More 0 Back 9 Menu
+  PASS responded inside the 10s USSD window (2.8s)
+  PASS answer arrives on the phone
+    > text='1*In two short sentences: what is Jos in Nigeria known for?*1*1' (0.0s)
+      CON (2/3) tin mining hub and Nigeria's home of tourism.
+      
+      Hi! I am Hermes (type /help for commands). Would you like to build a quick profile so I can assist you
+      1 More 0 Back 9 Menu
+  PASS responded inside the 10s USSD window (0.0s)
+    > text='1*In two short sentences: what is Jos in Nigeria known for?*1*1*1' (0.0s)
+      CON (3/3) better? You can accept, decline, or do it later.
+      0 Back 9 Menu
+  PASS responded inside the 10s USSD window (0.0s)
+  PASS no gateway home-channel nag
+  PASS real model answer mentions Jos/Plateau
+  PASS every screen <= 182 chars
+  PASS long reply copied to SMS inbox
+
+[2] approval: press 1 -> the command really runs
+    > text='' (0.0s)
+      CON Dial-a-Hermes
+      1 Ask Hermes
+      2 Last reply
+      3 Approvals (0)
+      4 Language
+      0 Exit
+  PASS responded inside the 10s USSD window (0.0s)
+    > text='1' (0.0s)
+      CON Type your question:
+  PASS responded inside the 10s USSD window (0.0s)
+    > text='1*Use the terminal tool to run exactly this command and nothing else: rm -rf /tmp/dah-approve-6zr2bs30' (2.2s)
+      CON Hermes wants to run (1/1):
+      rm -rf /tmp/dah-approve-6zr2bs30
+      Why: delete in root path
+      1 Approve 2 Deny 0 Back
+  PASS responded inside the 10s USSD window (2.2s)
+  PASS approval prompt reaches the keypad
+  PASS prompt shows the real command
+  PASS directory still exists before approval
+    > text='1*Use the terminal tool to run exactly this command and nothing else: rm -rf /tmp/dah-approve-6zr2bs30*1' (2.6s)
+      CON Approved. Hermes is continuing.
+      The command rm -rf /tmp/dah-approve-6zr2bs30 executed successfully with exit code 0.
+      0 Back 9 Menu 7 SMS
+  PASS responded inside the 10s USSD window (2.6s)
+  PASS approved command ran (directory deleted)
+
+[3] approval: press 2 -> it does not run; menus in Pidgin
+    > text='' (0.0s)
+      CON Dial-a-Hermes
+      1 Ask Hermes
+      2 Last reply
+      3 Approvals (0)
+      4 Language
+      0 Exit
+  PASS responded inside the 10s USSD window (0.0s)
+    > text='4' (0.0s)
+      CON Choose language:
+      1 English
+      2 Pidgin
+      0 Back
+  PASS responded inside the 10s USSD window (0.0s)
+    > text='4*2' (0.0s)
+      CON Language don change to Pidgin.
+      Dial-a-Hermes
+      1 Ask Hermes
+      2 Last answer
+      3 Wetin need OK (0)
+      4 Language
+      0 Comot
+  PASS responded inside the 10s USSD window (0.0s)
+  PASS Pidgin menu
+    > text='4*2*1' (0.0s)
+      CON Type wetin you wan ask:
+  PASS responded inside the 10s USSD window (0.0s)
+    > text='4*2*1*Use the terminal tool to run exactly this command and nothing else: rm -rf /tmp/dah-deny-pa86ed7f' (1.3s)
+      CON Hermes wan run dis (1/1):
+      rm -rf /tmp/dah-deny-pa86ed7f
+      Why: delete in root path
+      1 I gree 2 I no gree 0 Back
+  PASS responded inside the 10s USSD window (1.3s)
+  PASS Pidgin approval prompt
+    > text='4*2*1*Use the terminal tool to run exactly this command and nothing else: rm -rf /tmp/dah-deny-pa86ed7f*2' (2.1s)
+      CON You no gree. Hermes no go run am.
+      The command was denied by you and was not executed. Workflow stopped.
+      0 Back 9 Menu 7 SMS
+  PASS responded inside the 10s USSD window (2.1s)
+  PASS denied command did not run (directory kept)
+
+[4] safety
+    > text='' (0.0s)
+      END Sorry, this number is not allowed to use this Hermes.
+  PASS responded inside the 10s USSD window (0.0s)
+  PASS non-allowlisted number refused
+    > text='' (0.0s)
+      HTTP 404
+  PASS responded inside the 10s USSD window (0.0s)
+  PASS wrong callback token gets 404
+
+37/37 checks passed
+EXIT 0
